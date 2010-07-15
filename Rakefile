@@ -8,6 +8,7 @@ Echoe.new("mediainfo-ruby", "0.1.4") do |p|
 	p.author      = "David Martinez"
 	p.ignore_pattern = ["tmp/*", "script/*", "pkg/*"]
 	p.dependencies = ["rice"] # TODO How to do native dependencies?
+	p.require_signed = true
 end
 
 
