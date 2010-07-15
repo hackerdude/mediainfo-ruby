@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*.o
+*.bundle
+mkmf.log
+Manifest
+ext/mediainfo_ruby/Makefile
+
+pkg
+
