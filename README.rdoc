@@ -1,0 +1,32 @@
+= MediaInfo-Ruby
+
+== About MediaInfo-Ruby
+
+MediaInfo-Ruby is a gem to use the mediainfolib libraries from http://mediainfo.sourceforge.net directly.
+
+== Building MediaInfo-Ruby
+
+To build, simply make sure you have built libmediainfo and placed it in /usr/local somewhere, then do
+
+  gem install mediainfo-ruby
+
+To test that it built correctly, put some videos on spec/fixtures and run the only spec in spec. Or just try using it.
+
+== Using MediaInfo-Ruby
+
+Using MediaInfo-Ruby is simple. Just initialize the MediaInfoLib::MediaInfo class and start poking around:
+
+	# load the library
+	require 'mediainfo-ruby'
+
+	mediainfo = MediaInfoLib::MediaInfo.new
+	mediainfo.open("/path/to/my/video.mov")
+	begin
+		mediainfo.streams # 2
+		mediainfo.option_definitions # A giant map with instructions on each option
+		mediainfo.introspect # Asks and returns a giant map with all the options
+	finally
+		mediainfo.close
+	end
+
+We'll add more rubyisms as we feel they are needed, but so far that's all. You can go lower level and call the MediaInfo library directly by using the methods that have been surfaced (option, state_get, count_get, etc)
