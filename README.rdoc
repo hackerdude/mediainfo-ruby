@@ -6,11 +6,13 @@ MediaInfo-Ruby is a gem to use the mediainfolib libraries from http://mediainfo.
 
 == Building MediaInfo-Ruby
 
-To build, simply make sure you have built libmediainfo and placed it in /usr/local somewhere, then do
+To build, simply make sure you have built mediainfolib and the rice gem (mediainfolib is in c++) and installed them successfully, and also make sure the sources are in a place where the gem can get to them (/usr/local/src/mediainfolib is a good choice), then do:
 
   gem install mediainfo-ruby
 
-To test that it built correctly, put some videos on spec/fixtures and run the only spec in spec. Or just try using it.
+== Running the specs
+
+If you do development on this gem, to test that it built correctly, put some videos on spec/fixtures and run the specs.
 
 == Using MediaInfo-Ruby
 
@@ -30,3 +32,9 @@ Using MediaInfo-Ruby is simple. Just initialize the MediaInfoLib::MediaInfo clas
 	end
 
 We'll add more rubyisms as we feel they are needed, but so far that's all. You can go lower level and call the MediaInfo library directly by using the methods that have been surfaced (option, state_get, count_get, etc)
+
+== Mac OSX notes
+
+If you have a pre-snow leopard OSX, you need to remove the x86_64 archflags that the extconf.rb adds. Patches appreciated.
+
+Building mediainfolib on OSX is a bit challenging. I went the CMake route and had to do some changes. It worked but it put the libs directly on /usr/local (not on /usr/local/lib) and it didn't put any includes on /usr/local/include. I manually moved the libraries to /usr/local/lib and added code to check for the mediainfolib directory on /usr/local/src. It also listens to the environment variable MEDIAINFO_DIR which it uses to find its header files.
