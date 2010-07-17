@@ -52,20 +52,22 @@ module MediaInfoRubyisms_Streams
 		current = :general
 		switching = true
 		current_map = option_map[:general]
-		option_defs = self.option("Info_Parameters_CSV", "").split("\r").each{|row| 
+		option_defs = self.option("Info_Parameters_CSV", "").each_line{|row| 
 			if row.strip == ""
 				switching = true
 			else
 				kv = row.split(";")
 				if kv.length == 1 && switching
-					topic = kv[0].downcase.to_sym
+					topic = kv[0].chomp.downcase.to_sym
 					current_map = option_map[topic]
 					if current_map.nil?
 						option_map[topic] = current_map = {}
 					end
 					switching = false
 				else
-					current_map[kv[0]] = kv[1] unless remove_deprecated && kv[1].nil? ? false : kv[1].include?("Deprecated")
+					key   = kv[0]
+					value = kv[1].nil? ? nil : kv[1].chomp
+					current_map[key] = value unless remove_deprecated && kv[1].nil? ? false : kv[1].include?("Deprecated")
 				end
 			end
 		}
