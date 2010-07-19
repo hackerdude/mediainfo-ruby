@@ -5,6 +5,15 @@ puts "Loading mediainfo"
 require "mediainfo_ruby"
 
 module MediaInfoRubyisms_Streams
+	ThingsWithMultipleStreams = [:video, :audio]
+
+	# Set to true if you want empty values
+	attr_reader :empty_values
+
+	attr_reader :include_deprecated
+
+	attr_reader :include_inform
+
 	# A symbol map to translate from the Rubyisms we use on mediainfo-ruby
 	# to the constants libmediainfo uses.
 	StreamKindSymbolsMap = {
@@ -47,12 +56,13 @@ module MediaInfoRubyisms_Streams
 	# value is the help for that option.
 	# By default, anything marked as deprecated in the underlying 
 	# library is removed.
-	def option_definitions(remove_deprecated=true)
-		option_map = {}
+	def option_definitions
+		option_map = {:general=>{}}
 		current = :general
 		switching = true
 		current_map = option_map[:general]
-		option_defs = self.option("Info_Parameters_CSV", "").each_line{|row| 
+
+		option_defs = parameters_csv.each_line{|row| 
 			if row.strip == ""
 				switching = true
 			else
@@ -67,38 +77,55 @@ module MediaInfoRubyisms_Streams
 				else
 					key   = kv[0]
 					value = kv[1].nil? ? nil : kv[1].chomp
-					current_map[key] = value unless remove_deprecated && kv[1].nil? ? false : kv[1].include?("Deprecated")
+					current_map[key] = value unless ! (self.include_deprecated ) && kv[1].nil? ? false : kv[1].include?("Deprecated")
 				end
 			end
 		}
 		option_map
 	end
 	
+	def parameters_csv
+		params_csv = self.option("Info_Parameters_CSV", "")
+		if RUBY_PLATFORM =~ /darwin/
+			params_csv = params_csv.gsub("\r", "\n")
+		end
+		params_csv
+	end
+
 	# It introspects a video. This means returning a map of all the 
 	# values for a definition. By default empty values are not returned.
 	# Send with true to return empty values
-	def introspect(empty_values=false,include_inform=false)
+	def introspect
 		results = {}
 		self.option_definitions.each{|topic, topic_parameters|
 			kind_constant = StreamKindSymbolsMap[topic]
 			if ! kind_constant.nil?
-				results[topic] = {}
-				topic_parameters.each{|key, value|
-					# TODO Do this for multiple streams and whatnot?
-					#debugger if topic == :video && self.video_streams > 0
-					value = self.get_value(kind_constant, 0, key, MediaInfoLib_InfoKind::Text, MediaInfoLib_InfoKind::Name)
-
-					if empty_values == true || value.length > 0
-						results[topic][key] = value
-					end
-					if key == "Inform"
-						results[topic].delete(key) if ! include_inform
-					end
-					# self.get(kind_constant, 1,0, key) # Something like this
-				}
+				if ThingsWithMultipleStreams.include?(topic)
+					streams = self.send("#{topic.to_s}_streams".to_sym)
+					results[topic] = 0.upto(streams-1).collect{|ix| introspect_topic(kind_constant, topic_parameters, ix) }
+				else
+					results[topic] = introspect_topic(kind_constant, topic_parameters)
+				end
 			end
 		}
 		results
+	end
+
+private
+  def introspect_topic(kind_constant, topic_parameters, stream_index=0)
+		result = {}
+		topic_parameters.each{|key, value|
+			value = self.get_value(kind_constant, stream_index, key, MediaInfoLib_InfoKind::Text, MediaInfoLib_InfoKind::Name)
+	
+			if self.empty_values == true || value.length > 0
+				result[key] = value
+			end
+			if key == "Inform"
+				result.delete(key) if ! self.include_inform
+			end
+			# self.get(kind_constant, 1,0, key) # Something like this
+		}
+		result
 	end
 
 end
