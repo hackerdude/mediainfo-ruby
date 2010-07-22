@@ -102,7 +102,7 @@ module MediaInfoRubyisms_Streams
 			if ! kind_constant.nil?
 				if ThingsWithMultipleStreams.include?(topic)
 					streams = self.send("#{topic.to_s}_streams".to_sym)
-					results[topic] = 0.upto(streams-1).collect{|ix| introspect_topic(kind_constant, topic_parameters, ix) }
+					results[topic] = (0..(streams-1)).collect{|ix| introspect_topic(kind_constant, topic_parameters, ix) }
 				else
 					results[topic] = introspect_topic(kind_constant, topic_parameters)
 				end
