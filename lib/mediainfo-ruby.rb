@@ -5,7 +5,7 @@ puts "Loading mediainfo"
 require "mediainfo_ruby"
 
 module MediaInfoRubyisms_Streams
-	ThingsWithMultipleStreams = [:video, :audio]
+	ThingsWithMultipleStreams = [:video, :audio, :text]
 
 	# Set to true if you want empty values
 	attr_reader :empty_values
@@ -50,6 +50,7 @@ module MediaInfoRubyisms_Streams
 
 	# Returns how many streams are menu streams
 	def menu_streams ; self.count_get(MediaInfoLib_StreamKind::Menu, -1); end
+	def text_streams ; self.count_get(MediaInfoLib_StreamKind::Text, -1); end
 
 	# Returns a map of all the possible option definitions,
 	# where the key is the option we can ask for and the 
