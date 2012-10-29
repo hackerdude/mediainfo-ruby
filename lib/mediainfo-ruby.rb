@@ -1,14 +1,4 @@
 # Load the C++ library.
-require 'ffi'
-
-class MediaInfo
-
-  extend FFI::Library
-
-  functions = [
-
-  ]
-
 $:.unshift "#{File.dirname(__FILE__)}/../ext/mediainfo_ruby/"
 
 puts "Loading mediainfo"
@@ -148,6 +138,4 @@ end
 
 class MediaInfoLib::MediaInfo
 	include(MediaInfoRubyisms_Streams)
-end
-
 end
