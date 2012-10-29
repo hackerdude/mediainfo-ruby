@@ -5,6 +5,7 @@
 mkmf.log
 Manifest
 ext/mediainfo_ruby/Makefile
+spec/fixtures/*
 
 pkg
 
