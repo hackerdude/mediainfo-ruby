@@ -1,8 +1,20 @@
 # Load the C++ library.
+require 'ffi'
+
+class MediaInfo
+
+  extend FFI::Library
+
+  functions = [
+
+  ]
+
 $:.unshift "#{File.dirname(__FILE__)}/../ext/mediainfo_ruby/"
 
 puts "Loading mediainfo"
 require "mediainfo_ruby"
+
+
 
 module MediaInfoRubyisms_Streams
 	ThingsWithMultipleStreams = [:video, :audio]
@@ -86,6 +98,9 @@ module MediaInfoRubyisms_Streams
 	
 	def parameters_csv
 		params_csv = self.option("Info_Parameters_CSV", "")
+    if params_csv.include?("nable to load lib")
+      raise LoadError.new(params_csv)
+    end
 		if RUBY_PLATFORM =~ /darwin/
 			params_csv = params_csv.gsub("\r", "\n")
 		end
@@ -134,3 +149,4 @@ class MediaInfoLib::MediaInfo
 	include(MediaInfoRubyisms_Streams)
 end
 
+end
